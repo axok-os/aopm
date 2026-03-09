@@ -1,0 +1,9 @@
+{
+    "name": "test-package",
+    "version": "1.0.0",
+    "description": "Just a test package :)",
+    "author": "GusDev",
+    "author_email": "axok.os.team@gmail.com",
+    "type": "package",
+    "deps": []
+}

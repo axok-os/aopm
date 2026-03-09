@@ -1,0 +1,2 @@
+1 - achar um jeito do __init__() da API do AOPM fechar caso haja erro e obviamente recompilar : meio feito
+2 - continuar o install.py
