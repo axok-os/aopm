@@ -34,7 +34,7 @@ def get_header() -> dict:
     """
     return header
 
-def run(parameters : list, modules_home: str):
+def run(parameters : list, modules_home: str) -> int:
     """
     Run the module
 
@@ -63,6 +63,7 @@ Examples:
     aopm install grub-efi - Call the 'install' module
     aopm module show - Display all valid modules
 """)
+            return 0
         case "module":
             if argc < 2:
                 aopmAPI.error("You need to specify the module to get help :(", True)

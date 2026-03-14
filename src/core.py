@@ -37,19 +37,33 @@ essential_sections = [
     "Paths",
 ]
 
+# the essential keys/options
+essential_options = [
+    "repos_path",
+    "modules_path",
+    "repos_index_path"
+]
+
 # read the configs file
 conf = ConfigParser()
 conf.read(config_file)
 
-# check the sections
+# check the config file
 for section in essential_sections:
     if conf.has_section(section):
-        pass
+        for option in essential_options:
+            if conf.has_option(section, option):
+                pass
+            else:
+                aopmAPI.error(f"The config file dont have the key: '{option}' in '{section}' :(", True)
     else:
-        aopmAPI.error(f"The config file dont have the section: '{section}' :(", True)
+        aopmAPI.error(f"The config file dont have the section '{section}' :(", True)
 
 # get the variables from config file
 modules_path = conf.get("Paths", "modules_path")
+repos_path = conf.get("Paths", "repos_path")
+repos_index_path = conf.get("Paths", "repos_index_path")
+
 
 # check if the user is root
 if os.geteuid() != 0:
@@ -86,7 +100,8 @@ else:
 module_reader = aopmAPI.Api_header(module_header)
 if module_reader.check():
     if hasattr(module, "run"):
-        module.run(parameters_to_module, modules_path)
+        exit_code = module.run(parameters_to_module, modules_path, repos_path, repos_index_path)
+        sys.exit(exit_code)
     else:
         aopmAPI.error(f"The module: '{module_to_search}' dont have the run function :(", True)
 else:

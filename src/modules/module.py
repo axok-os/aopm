@@ -35,7 +35,7 @@ def get_header() -> dict:
 
     return header
 
-def run(parameters: list, *args):
+def run(parameters: list, *args) -> int:
     """
     Run the module.
 
@@ -102,7 +102,7 @@ header = {
     "version": "1.0.0",
     "description": "Your module description.",
     "author": "Your Name",
-    "author_email": "your.email@gmail.com",
+    "author_email": "your.email@here.com",
     "api_version": "1.0.0"
 }
 
@@ -111,7 +111,7 @@ def get_header() -> dict:
     return header
 
 # the core will run this
-def run(parameters: list, *args):
+def run(parameters: list, *args) -> int:
     pass
 
 # display your custom help message
@@ -125,4 +125,14 @@ def help():
 
 
 def help():
-    pass
+    print("""
+Module module:
+---------------
+    Create modules, view all modules, get info about modules
+
+Usage:
+-------
+    aopm module show - Display all found modules
+    aopm module info [MODULE] - Display the API header from the specified module
+
+""")
