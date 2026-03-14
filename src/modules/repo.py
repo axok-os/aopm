@@ -203,7 +203,13 @@ def run(parameters: list, *args) -> int:
                         return 1
                 case _:
                     aopm.error(f"Invalid 'repo_type': '{repo_index["repo_type"]}' :(", True)
-        
+            
+            try:
+                if p(f"{repo_dir}/{repo_to_init}/aoprepo.json").is_file():
+                    shutil.copy(f"{repo_dir}/{repo_to_init}/aoprepo.json", f"{repo_index_dir}/{repo_to_init}/aoprepo.json")
+            except FileExistsError:
+                aopm.warn(f"Already exist a aoprepo.json. If you want delete use: 'aopm repo deinit {repo_index["name"]}'")
+
         case "deinit":
             if argc < 2:
                 aopm.error("No repository name to deinit :(", True)
