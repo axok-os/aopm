@@ -6,7 +6,9 @@
     Axok!_OS Package Manager
 </pre>
 
-**AOPM (Axok!\_OS Package Manager)** is a simple package manager made for Axok!\_OS
+> A package manager! (dependencies are a choice - we chose no)
+
+**AOPM (Axok!\_OS Package Manager)** is a simple and direct package manager made for Axok!\_OS
 
 ## Features
 
@@ -16,6 +18,11 @@
 
 - Modular and expandable 🧩
 
+- **No dependencies. No chaos. 🚫📦**
+  - No dependency resolution system
+  - No dependency hell
+  - Just install and run
+
 ## DISCLAIMER ⚠️
 
-The AOPM is under building, so you cant use AOPM for now :)
+The AOPM is under building, so you cant use AOPM yet :)
