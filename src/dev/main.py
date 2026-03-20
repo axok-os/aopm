@@ -18,6 +18,7 @@ import json
 import os
 import tarfile
 import hashlib
+import tempfile
 
 try:
     import aopmAPI as aopm
@@ -49,6 +50,9 @@ if os.geteuid() == 0:
 action = sys.argv[1]
 path = sys.argv[2]
 
+# get the config_file this path probably will be edited by configure command
+keys_path = "/home/gustavo/Projetos/axok-os/aopm/keys"
+
 match action:
     case "init"|"create":
         # check if the path exists and if is a directory
@@ -78,8 +82,7 @@ match action:
             "description": "Your package description.",
             "author": "Your Name.",
             "author_email": "your.email@here.com",
-            "type": "package",
-            "dependencies": []
+            "type": "package"
         }
 
         try:
