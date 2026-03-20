@@ -12,6 +12,7 @@ Made by: GusDev
 #   ex: sys
 
 import sys
+import subprocess as sub
 
 
 # Global variables
@@ -150,3 +151,78 @@ class Api_header():
             sys.exit(1)
         else:
             return True
+
+# make all the gpg stuff
+class GPG_mantainer:
+    """
+    
+    Manage all GPG features for AOPM
+
+    :param gpg_home: The GPG home
+    :type gpg_home: str
+
+    """
+    def __init__(self, gpg_home):
+        self.gpg_home = gpg_home
+    
+    def import_key(self, key_path):
+        """
+        
+        Import a .asc key
+
+        :param key_path: The key.asc path
+        :type key_path: str
+
+        """
+        sub.run([
+            "gpg",
+            "--homedir",
+            self.gpg_home,
+            "--import",
+            key_path
+            ], check=True, stderr=sub.DEVNULL, stdout=sub.DEVNULL)
+        
+    def sign_file(self, file_path, output):
+        """
+        
+        Sign a file with a .asc key file
+
+        :param file_path: The file to be signed
+        :type file_path: str
+        :param output: The path for the .sig
+        :type output: str
+        
+        """
+        sub.run([
+            "gpg",
+            "--homedir",
+            self.gpg_home,
+            "--batch",
+            "--yes",
+            "--output",
+            output,
+            "--detach-sign",
+            file_path
+        ], check=True, stderr=sub.DEVNULL, stdout=sub.DEVNULL)
+    
+    def verify_file(self, sig_path, file_path) -> bool:
+        """
+        
+        Check if a file and a .sig match
+
+        :param sig_path: The path to the .sig
+        :type sig_path: str:
+        :param file_path: The path to the file to check
+        :type file_path: str
+
+        """
+        result = sub.run([
+            "gpg",
+            "--homedir",
+            self.gpg_home,
+            "--verify",
+            sig_path,
+            file_path
+        ], stderr=sub.DEVNULL, stdout=sub.DEVNULL)
+
+        return result.returncode == 0
