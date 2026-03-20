@@ -63,6 +63,8 @@ for section in essential_sections:
 modules_path = conf.get("Paths", "modules_path")
 repos_path = conf.get("Paths", "repos_path")
 repos_index_path = conf.get("Paths", "repos_index_path")
+keys_path = conf.get("Paths", "keys_path")
+packages_path = conf.get("Paths", "packages_path")
 
 
 # check if the user is root
@@ -100,7 +102,13 @@ else:
 module_reader = aopmAPI.Api_header(module_header)
 if module_reader.check():
     if hasattr(module, "run"):
-        exit_code = module.run(parameters_to_module, modules_path, repos_path, repos_index_path)
+        exit_code = module.run(parameters_to_module, # parameters
+                                modules_path, # args[0] --------
+                                repos_path, # args[1]
+                                repos_index_path, # args[2]
+                                keys_path, # args[3]
+                                packages_path # args[4]
+                            )
         sys.exit(exit_code)
     else:
         aopmAPI.error(f"The module: '{module_to_search}' dont have the run function :(", True)
