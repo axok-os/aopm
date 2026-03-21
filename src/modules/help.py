@@ -34,7 +34,7 @@ def get_header() -> dict:
     """
     return header
 
-def run(parameters : list, modules_home: str) -> int:
+def run(parameters : list, modules_home: str, *args) -> int:
     """
     Run the module
 
