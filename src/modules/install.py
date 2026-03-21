@@ -256,7 +256,7 @@ def run(parameters: list, *args) -> int:
             print("The package GPG signature verification failed.\nInstall at your own risk. This package may be unsafe or tampered.")
             print("-" * 30)
         for key in aopkg_manifest_content:
-            print(f"{str(key).title().replace("_", " ").replace("-", " ")} : {(aopkg_manifest_content[key])}")
+            print(f"{str(key).title().replace("_", " ").replace("-", " ")}: {(aopkg_manifest_content[key])}")
 
         # get confirm
         user_confirm = None
@@ -303,10 +303,13 @@ def run(parameters: list, *args) -> int:
             aopm.info("User canceled. Aborting...")
             return 1
 
-        print("-" * 30)
-
 def help():
     print("""
-
-
+install Module:
+----------------
+    Install packages.
+Examples:
+----------
+    aopm install grub-efi - Search and install the package 'grub-efi'
+    aopm install aopkg - Search and install the package 'aopkg'
 """)
