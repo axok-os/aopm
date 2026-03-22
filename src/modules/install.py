@@ -257,25 +257,57 @@ def run(parameters: list, *args) -> int:
             print("-" * 30)
         for key in aopkg_manifest_content:
             print(f"{str(key).title().replace("_", " ").replace("-", " ")}: {(aopkg_manifest_content[key])}")
+        print("-" * 30)
 
         # get confirm
-        user_confirm = None
-        while user_confirm == None:
-            user_input = input("Want install this package?[y/N]: ").strip()
-            if user_input.lower() == "":
-                aopm.warn("No option found. Using preset: 'False'...")
-                user_confirm = False
-            else:
-                match user_input.lower():
-                    case "y"|"yes":
-                        user_confirm = True
-                    case "n"|"no":
-                        user_confirm = False
-                    case _:
-                        aopm.error("Invalid option :(. Try again")
-                        continue
+        if "--force" in argv:
+            user_confirm = True
+        else:
+            user_confirm = None
+            while user_confirm == None:
+                user_input = input("Want install this package?[y/N]: ").strip()
+                if user_input.lower() == "":
+                    aopm.warn("No option found. Using preset: 'False'...")
+                    user_confirm = False
+                else:
+                    match user_input.lower():
+                        case "y"|"yes":
+                            user_confirm = True
+                        case "n"|"no":
+                            user_confirm = False
+                        case _:
+                            aopm.error("Invalid option :(. Try again")
+                            continue
         
         if user_confirm:
+            if verified:
+                pass
+            else:
+                print("The package GPG signature verification failed.\nInstall at your own risk. This package may be unsafe or tampered.")
+                user_confirm_warn = None
+                if "--no-warn" in argv:
+                    user_confirm_warn = True
+                else:
+                    while user_confirm_warn == None:
+                        user_input = input(f"Want install the package: '{package_to_search}'?[y/N]: ").strip().lower()
+                        if user_input == "":
+                            aopm.warn("No option found. Using preset: 'False'...")
+                            user_confirm_warn = False
+                        else:
+                            match user_input:
+                                case "y"|"yes":
+                                    user_confirm_warn = True
+                                case "n"|"no":
+                                    user_confirm_warn = False
+                                case _:
+                                    aopm.error("Invalid option :(. Try again.")
+                                    continue
+                    match user_confirm_warn:
+                        case True:
+                            pass
+                        case False:
+                            aopm.info("User canceled. Aborting...")
+                            return 1
             aopm.info("Installing package...")
             env = os.environ.copy()
             env["aoproot"] = "/"
@@ -296,7 +328,7 @@ def run(parameters: list, *args) -> int:
             shutil.copy(f"{tmp}/extract2/aopkg.json", f"{packages_path}/{package_to_search}/aopkg.json")
             shutil.copy(f"{tmp}/extract2/file-list", f"{packages_path}/{package_to_search}/file-list")
             
-            aopm.success("Pakcage added to 'installed packages!'")
+            aopm.success("Package added to 'installed packages!'")
             aopm.success("Everything looks done!")
             return 0
         else:
