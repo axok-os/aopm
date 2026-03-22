@@ -225,12 +225,12 @@ esac"""
                     # dirs
                     for d in dirs:
                         dir_path = os.path.relpath(os.path.join(root, d), f"{path}/compile-build")
-                        f.write(dir_path + "\n")
+                        f.write("/" + dir_path + "\n")
                         
                     # archives
                     for archive in archives:
                         file_path = os.path.relpath(os.path.join(root, archive), f"{path}/compile-build")
-                        f.write(file_path + "\n")
+                        f.write("/" + file_path + "\n")
         except PermissionError:
             print("==> \033[31m[ERROR]\033[0m: Dont have permission to create the files-list archive on the directory :(")
             sys.exit(1)
