@@ -18,7 +18,11 @@ from configparser import ConfigParser
 import os
 
 # try import the AOPM API
-import aopmAPI
+try:
+    import aopmAPI
+except ImportError:
+    print("Cant import AOPM Module :(")
+    sys.exit(1)
 
 # global variables
 # -----------------
@@ -113,4 +117,5 @@ if module_reader.check():
     else:
         aopmAPI.error(f"The module: '{module_to_search}' dont have the run function :(", True)
 else:
-    print("vish")
+    print("Cant verify the API Header :(")
+    sys.exit(1)
