@@ -49,39 +49,36 @@ if config_content:
 else:
     error("Cant open '.config' file :(", True)
 
-info("Compiling src/core.py(aopm)...")
-os.makedirs("compile", exist_ok=True)
-core_try = sub.run(["pyinstaller", "--onefile", "src/core.py", "--distpath", "compile", "--name", "aopm"], capture_output=True)
-if core_try.returncode == 0:
-    os.chmod("compile/aopm", 0o755)
-    success("src/core.py(aopm) compiled!")
-else:
-    error(f"Something went wrong :(. Exit code: {core_try.returncode}", True)
-
-for line in config_content.splitlines():
-    if line.startswith("with-aopkg"):
-        aopkg_line = line.split("=")
-        match aopkg_line[1].lower().strip():
-            case "true":
-                info("Compiling src/dev/main.py(aopkg)...")
-                aopkg_try = sub.run(["pyinstaller", "--onefile", "src/dev/main.py", "--distpath", "compile", "--name", "aopkg"], capture_output=True)
-                if aopkg_try.returncode == 0:
-                    os.chmod("compile/aopkg", 0o755)
-                    success(f"src/dev/main.py(aopkg) compiled!")
-                else:
-                    error(f"Something went wrong :(. Exit code: {aopkg_try.returncode}", True)
-            case "false":
-                warn("Skipping aopkg build...")
-            case _:
-                error(f"Invalid option for: 'with-aopkg': {aopkg_line[1]} :(", True)
-        
-
 info("Compiling AOPM API...")
 api_try = sub.run(["python3", "-m", "build", "src/lib/api/aopmAPI", "--outdir", "compile"], stdout=sub.DEVNULL, stderr=sub.DEVNULL)
 if api_try.returncode == 0:
     success("AOPM API compiled!")
 else:
     error(f"Something went wrong :(. Exit code: {api_try.returncode}.", True)
+
+info("Generating 'aopm' shortcut...")
+shortcut_content = """#!/usr/bin/env bash
+python3 /usr/share/aopm/core.py "$@"
+"""
+with open("compile/aopm", "r") as f:
+    f.write(shortcut_content)
+
+for line in config_content.splitlines():
+    if line.startswith("with-aopkg"):
+        aopkg_line = line.split("=")
+        match aopkg_line[1].strip().lower():
+            case "true":
+                info("Generating 'aopkg' shortcut...")
+                shortcut_content = """#!/usr/bin/env bash
+python3 /usr/share/aopm/aopkg.py "$@"
+"""
+                with open("compile/aopkg", "w") as f:
+                    f.write(shortcut_content)
+                success("'aopkg' shortcut generated!")
+            case "false":
+                info("Skipping 'aopkg' shortcut generation...")
+            case _:
+                error("Invalid value for 'with-aopkg' in .config file :(", True)
 
 aopm_conf_content = None
 with open("configs/aopm.conf", "r") as f:

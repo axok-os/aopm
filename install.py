@@ -130,8 +130,6 @@ Author Email: axok.os.team@gmail.com
 License: GPL-2.0""")
 print("-" * 30)
 
-print(prefix)
-
 # confirm
 user_confirm = None
 while user_confirm == None:
@@ -164,7 +162,7 @@ match user_confirm:
             f"{prefix}/lib/aopm/repos",
             var_dir,
             f"{var_dir}/aopm/packages",
-            config_dir
+            config_dir,
         ]
 
         for directory in main_dirs:
@@ -179,11 +177,13 @@ match user_confirm:
         # cory core
         info("Copying core...")
         shutil.copy(f"{base_dir}/compile/aopm", f"{prefix}/bin/aopm")
+        os.chmod(f"{prefix}/bin/aopm", 0o755)
         success("Core copied!")
         # check and install aopkg
         if aopkg == "true":
             info("Copying AOPKG...")
-            shutil.copy(f"{base_dir}/compile/aopkg", f"{prefix}/bin/aopkg")
+            shutil.copy(f"{base_dir}/src/dev/main.py", f"{prefix}/share/aopm/aopkg.py")
+            os.chmod(f"{prefix}/share/aopm/aopkg.py", 0o755)
             success("AOPKG copied!")
         # install modules
         info("Copying modules...")
