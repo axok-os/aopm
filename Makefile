@@ -1,7 +1,8 @@
 CONFIGURE_FLAGS = --prefix=/usr --with-aopkg=true --config-dir=/etc/aopm.d --var-dir=/var/aopm
 ENV = bash
 PYTHON = python3
-CONFIG_FILE = install.config
+CONFIG_FILE = .config
+INSTALL_FILE = install.config
 configure:
 	@$(ENV) configure.sh $(CONFIGURE_FLAGS)
 
@@ -17,4 +18,4 @@ clean:
 	@rm -f .config
 
 install:
-	@$(PYTHON) install.py $(CONFIG_FILE)
+	@$(PYTHON) install.py $(INSTALL_FILE)
