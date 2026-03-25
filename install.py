@@ -118,7 +118,7 @@ if None in config_variables:
 if aopkg not in ["true", "false"]:
     error(f"Invalid option for: 'with-aopkg': {aopkg} :(", True)
 
-sub.run(["clear"])
+print("\n")
 print("Package Detected:")
 print("-" * 30)
 print(f"""Name: AOPM (Axok!_OS Package Manager)
@@ -177,19 +177,21 @@ match user_confirm:
         # cory core
         info("Copying core...")
         shutil.copy(f"{base_dir}/compile/aopm", f"{prefix}/bin/aopm")
+        shutil.copy(f"{base_dir}/src/core.py", f"{prefix}/share/aopm/core.py")
         os.chmod(f"{prefix}/bin/aopm", 0o755)
         success("Core copied!")
         # check and install aopkg
         if aopkg == "true":
             info("Copying AOPKG...")
+            shutil.copy(f"{base_dir}/compile/aopkg", f"{prefix}/bin/aopkg")
             shutil.copy(f"{base_dir}/src/dev/main.py", f"{prefix}/share/aopm/aopkg.py")
-            os.chmod(f"{prefix}/share/aopm/aopkg.py", 0o755)
+            os.chmod(f"{prefix}/bin/aopkg", 0o755)
             success("AOPKG copied!")
         # install modules
         info("Copying modules...")
         for module in p(f"{base_dir}/src/modules").iterdir():
             if module.is_file() and module.suffix == ".py":
-                shutil.copy(module, f"{prefix}/share/aopm/modules/{module.name}{module.suffix}")
+                shutil.copy(module, f"{prefix}/share/aopm/modules/{module.name}")
                 success(f"Module: '{module.name}' copied!")
         
         success("All modules copied!")
