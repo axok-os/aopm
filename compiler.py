@@ -60,7 +60,7 @@ info("Generating 'aopm' shortcut...")
 shortcut_content = """#!/usr/bin/env bash
 python3 /usr/share/aopm/core.py "$@"
 """
-with open("compile/aopm", "r") as f:
+with open("compile/aopm", "w") as f:
     f.write(shortcut_content)
 
 for line in config_content.splitlines():
