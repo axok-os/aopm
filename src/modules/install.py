@@ -308,14 +308,29 @@ def run(parameters: list, *args) -> int:
                         case False:
                             aopm.info("User canceled. Aborting...")
                             return 1
-            aopm.info("Installing package...")
             env = os.environ.copy()
             env["aoproot"] = "/"
-            install_try = sub.run(["bash", f"{tmp}/extract2/aopkg-tools/install.sh", "install"], env=env)
+            aopm.info("Executing pre-install triggers...")
+            pre_install_try = sub.run(["bash", f"{tmp}/extract2/aopkg-tools/install.sh", "pre_install"], env=env, capture_output=True)
+            if pre_install_try.returncode == 0:
+                aopm.success("Pre-install triggers executed!")
+            else:
+                aopm.error(f"Something went wrong :(. Exit code: {pre_install_try.returncode}", True)
+            aopm.info("Installing package...")
+            
+            install_try = sub.run(["bash", f"{tmp}/extract2/aopkg-tools/install.sh", "install"], env=env, capture_output=True)
             if install_try.returncode == 0:
                 aopm.success("Package installed!")
             else:
                 aopm.error(f"Something went wrong :(. Exit code: {install_try.returncode}")
+            
+            aopm.info("Executing post-install triggers...")
+            post_install_try = sub.run(["bash", f"{tmp}/extract2/aopkg-tools/install.sh", "post_install"], env=env, capture_output=True)
+            if post_install_try.returncode == 0:
+                aopm.success("Post-install triggers executed!")
+            else:
+                aopm.error(f"Something went wrong :(. Exit code: {post_install_try.returncode}", True)
+
             
             aopm.info("Adding package to 'installed packages'...")
             packages_path = args[4]
