@@ -247,7 +247,7 @@ def run(parameters: list, *args) -> int:
         
         aopm.info("Opening manifest...")
         aopkg_manifest_content = json.load(open(f"{tmp}/extract2/aopkg.json", "r"))
-        sub.run(["clear"])
+        print("\n")
         print("package detected!".title())
         print("-" * 30)
         if verified:

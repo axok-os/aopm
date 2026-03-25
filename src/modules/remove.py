@@ -85,7 +85,7 @@ def run(parameters: list, *args) -> bool:
         else:
             aopm.error("Cant open the file: 'aopkg.json' :(", True)
         
-        sub.run(["clear"])
+        print("\n")
         print("Package Detected!")
         print("-" * 30)
         for key in aopkg_content:
