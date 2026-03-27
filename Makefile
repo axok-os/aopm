@@ -11,9 +11,6 @@ compile:
 
 clean:
 	@rm -r compile
-	@rm -r build
-	@rm -f aopm.spec
-	@rm -f aopkg.spec
 	@rm -f install.config
 	@rm -f .config
 
