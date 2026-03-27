@@ -60,8 +60,6 @@ aopm [Method/Nodule] [Parameters]
 Examples:
     aopm help me - Display this message
     aopm help module (module name) - Display help for the specified module
-    aopm install grub-efi - Call the 'install' module
-    aopm module show - Display all valid modules
 """)
             return 0
         case "module":
