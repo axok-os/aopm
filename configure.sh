@@ -29,7 +29,6 @@ prefix="none"
 with_aopkg="true"
 config_dir="none"
 var_dir="none"
-static="false"
 
 # parse
 for arg in "$@"; do
@@ -54,10 +53,6 @@ for arg in "$@"; do
             info "Parameter: var-dir=$var_dir"
             shift
             ;;
-        --static)
-            static="true"
-            shift
-            ;;
         *)
             error "Invalid option $arg :("
             exit 1
@@ -66,11 +61,11 @@ done
 
 info "Checking dependencies..."
 
-info "Searching for: 'pyinstaller'..."
-if command -v pyinstaller &>/dev/null; then
-    success "'pyinstaller' found!"
+info "Searching for: 'build'..."
+if pip show build &>/dev/null; then
+    success "'build' found!"
 else
-    error "Cant found: 'pyinstaller' :("
+    error "Cant found: 'build' :("
     exit 1
 fi
 
