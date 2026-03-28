@@ -46,7 +46,7 @@ def run(parameters: list, *args) -> int:
     match argv[0]:
         case "create":
             if argc < 2:
-                aopm.error("No repository name to create :(", True)
+                aopm.error("No repository name to create specified :(", True)
             
             repo_name = argv[1]
             repo_dir = args[1]
@@ -59,7 +59,7 @@ def run(parameters: list, *args) -> int:
             while repo_link == "":
                 user_repo_link = input("Repository link(not the download link): ")
                 if user_repo_link.strip().lower() == "":
-                    aopm.error("This part cannot be empty. Try again :)")
+                    aopm.error("The repository link cannot be empty. Try again :)")
                     continue
                 else:
                     try:
@@ -83,7 +83,7 @@ def run(parameters: list, *args) -> int:
             while repo_download_link == "":
                 user_download_link = input("Repository download link: ")
                 if user_download_link.strip().lower() == "":
-                    aopm.error("This part cannot be empty. Try again :)")
+                    aopm.error("The repository download link cannot be empty. Try again :)")
                     continue
                 else:
                     try:
@@ -202,7 +202,7 @@ def run(parameters: list, *args) -> int:
                         aopm.warn(f"Already exist a index.json. If you want delete use: 'aopm repo deinit {repo_index["name"]}'")
                         return 1
                 case _:
-                    aopm.error(f"Invalid 'repo_type': '{repo_index["repo_type"]}' :(", True)
+                    aopm.error(f"Invalid variable: 'repo_type': '{repo_index["repo_type"]}' :(", True)
             
             try:
                 if p(f"{repo_dir}/{repo_to_init}/aoprepo.json").is_file():
@@ -210,9 +210,9 @@ def run(parameters: list, *args) -> int:
             except FileExistsError:
                 aopm.warn(f"Already exist a aoprepo.json. If you want delete use: 'aopm repo deinit {repo_index["name"]}'")
 
-        case "deinit":
+        case "shutdown":
             if argc < 2:
-                aopm.error("No repository name to deinit :(", True)
+                aopm.error("No repository name to shutdown specified :(", True)
             
             repo_to_deinit = argv[1]
             repos_index_dir = args[2]
@@ -273,18 +273,32 @@ def run(parameters: list, *args) -> int:
                     print("-" * 30)
                 case _:
                     aopm.error(f"Invalid repository type specified: '{repo_type_to_show}'")
+        case "remove":
+            pass
+        
+        case _:
+            aopm.error("Invalid operation specified :(", True)
 
 
 # display your custom help message
 def help():
-    print("""
-repo Module:
+    title_line = f"{header["name"]}-{header["version"]} Module"
+    print(f"""
+{title_line}
+{"=" * (len(title_line + 1))}
+
+Description:
 -------------
-    Create, init, deinit, show your repositories.
+    Create, remove, init, shutdown and show repositories.
 
 Usage:
--------
-    aopm repo create core - Create a repository named 'core'
-    aopm repo init core - Init the repository 'core'
-    aopm repo list active - Display all active repositories
+    aopm repo <operation> <repository>
+
+Example(s):
+----------
+    aopm repo create core      Create a repository with the specified name.
+    aopm repo init core        Init the specified repository name.
+    aopm repo show active      Show all activated repostiories found.
+    aopm repo show deactive    Show all deactivated repositories found.
+    aopm repo shutdown core    Shutdown the specified repository name.
 """)
