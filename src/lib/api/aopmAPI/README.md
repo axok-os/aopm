@@ -69,3 +69,13 @@ def help():
 ```
 
 In this example the `run()` function need to return a int value for the core exit with this value as exit code. The parameter **args** is used to receive extra parameters without crash by too much parameters.
+
+### Another alternative
+
+If you dont want problems build your module basic estructure you can use the module: 'module' to create and custom module example with:
+
+```bash
+aopm module create your-module
+```
+
+The `your-module` you can change by the name of your module.
