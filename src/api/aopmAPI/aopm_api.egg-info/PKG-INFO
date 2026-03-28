@@ -1,0 +1,7 @@
+Metadata-Version: 2.4
+Name: aopm_api
+Version: 1.0.0
+Summary: The AOPM (Axok!_OS Package Manager) API
+Author-email: GusDev <axok.os.team@gmail.com>
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
