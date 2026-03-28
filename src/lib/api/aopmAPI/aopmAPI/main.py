@@ -226,3 +226,11 @@ class GPG_mantainer:
         ], stderr=sub.DEVNULL, stdout=sub.DEVNULL)
 
         return result.returncode == 0
+
+def get_api() -> tuple:
+    """
+    
+    Return the API Version
+
+    """
+    return __version__
