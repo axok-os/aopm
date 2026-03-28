@@ -66,7 +66,7 @@ def run(parameters: list, *args) -> int:
             if hasattr(module, "get_header"):
                 module_header = module.get_header()
             else:
-                aopm.error(f"The module: '{module_to_get_info}' dont have the function get_header :(", True)
+                aopm.error(f"The module: '{module_to_get_info}' dont have the function 'get_header' :(", True)
             
             print("Module Info:")
             print("-------------")
@@ -82,7 +82,7 @@ def run(parameters: list, *args) -> int:
         
         case "create":
             if argc < 2:
-                aopm.error("No module to create specified :(", True)
+                aopm.error("No module name to create specified :(", True)
             else:
                 module_to_create = argv[1]
 
@@ -121,18 +121,27 @@ def help():
             with open(f"{args[0]}/{module_to_create}.py", "w", encoding="utf-8") as f:
                 f.write(module_preset)
             
-            print("Module created!")
+            aopm.success("Module created!")
+            aopm.success("Everything looks done!")
+            return 0
 
 
 def help():
-    print("""
-Module module:
----------------
-    Create modules, view all modules, get info about modules
+    title_line = f"{header["name"]}-{header["version"]} Module"
+    print(f"""
+{title_line}
+{"=" * (len(title_line) + 1)}
+
+Description:
+-------------
+    Display infos about modules, see all instaleld modules and create example modules.
 
 Usage:
--------
-    aopm module show - Display all found modules
-    aopm module info [MODULE] - Display the API header from the specified module
+    aopm module <operation> <module>
 
+Example(s):
+----------
+    aopm module info install     Display informations about the specified module.
+    aopm module create search    Create a module named: 'search'.
+    aopm module show             Display all installed modules found.
 """)
