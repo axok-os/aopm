@@ -59,7 +59,7 @@ match action:
         if p(path).is_dir():
             pass
         else:
-            print("==> \033[31m[ERROR]\033[0m: The path dont exist or is not a directory :(")
+            aopm.error("The specified path dont exist or is not a directory :(")
             sys.exit(1)
 
         # create the main files
@@ -71,10 +71,10 @@ match action:
             for directory in main_files:
                 os.makedirs(directory, exist_ok=True)
         except PermissionError:
-            print("==> \033[31m[ERROR]\033[0m: You dont have permission to create a aopkg on this directory :(")
+            aopm.error("You dont have permission to create a aopkg on this directory :(", True)
             sys.exit(1)
         except FileExistsError:
-            print("=> \033[33m[WARNING]\033[0m: Already exist some directories.")
+            aopm.warn("Already exist an aopkg on this directory. This may cause fails.")
         
         aopkg_manifest = {
             "name": "your-package-name",
@@ -89,10 +89,10 @@ match action:
             with open(f"{path}/aopkg.json", "w") as f:
                 json.dump(aopkg_manifest, f)
         except PermissionError:
-            print("==> \033[31m[ERROR]\033[0m: You dont have permission to create a aopkg manifest on this directory :(")
+            aopm.error("You dont have permission to create a aopkg manifest on this directory :(", True)
             sys.exit(1)
         except FileExistsError:
-            print("=> \033[33m[WARNING]\033[0m: Already exist an aopkg manifest. This may cause fails")
+            aopm.warn("Already exist an aopkg manifest. This may cause fails")
         
         install_file_content = """#!/usr/bin/env bash
 
@@ -125,25 +125,42 @@ install_def() {
     install -Dm755 "$aopkg_root/files/algo" "$aoproot/usr/bin/algo"
 }
 
+# function to use pre-install triggers to prepare the host pc
+pre_install_def() {
+    # here you can make your commands to prepare your package, like create users
+    :
+}
+
+# function to user post_install triggers to make the final prepare for the host pc
+post_install_def() {
+    # here you can delete unused libs that your package install for example
+    :
+}
+
 # use this for call the functions
 case "$1" in
     compile)
         compile ;;
     install)
         install_def ;;
+    pre_intall)
+        pre_install_def ;;
+    post_install)
+        post_install_def ;;
 esac"""
 
         try:
             with open(f"{path}/aopkg-tools/install.sh", "w") as f:
                 f.write(install_file_content)
         except PermissionError:
-            print("==> \033[31m[ERROR]\033[0m: You dont have permission to create the install.sh on this directory :(")
+            aopm.error("You dont have permission to create the install.sh on this directory :(", True)
             sys.exit(1)
         except FileExistsError:
-            print("=> \033[33m[WARNING]\033[0m: Already exist an install.sh. This may cause fails")
+            aopm.warn("Already exist an install.sh. This may cause fails")
             
 
-        print("==> \033[32m[SUCCESS]\033[0m: Aopkg project created!")
+        aopm.success("Aopkg project created!")
+        aopm.success("Everything looks done!")
         sys.exit(0)
 
     case "compile":
@@ -161,25 +178,25 @@ esac"""
             if p(directory).is_dir():
                 pass
             else:
-                print(f"==> \033[31m[ERROR]\033[0m: The directory '{directory}' dont exist :(")
+                aopm.error(f"The directory '{directory}' dont exist in package :(", True)
                 sys.exit(1)
         
         for archive in essential_files:
             if p(archive).is_file():
                 pass
             else:
-                print(f"==> \033[31m[ERROR]\033[0m: The file '{archive}' dont exist :(")
+                aopm.error(f"The file '{archive}' dont exist in package :(", True)
                 sys.exit(1)
         
         # check if the install.sh and aopkg.json is empty
         with open(f"{path}/aopkg.json", "r") as f:
             if f.read() == "":
-                print("==> \033[31m[ERROR]\033[0m: The aopkg.json is empty :(")
+                aopm.error("The aopkg.json is empty :(", True)
                 sys.exit(1)
         
         with open(f"{path}/aopkg-tools/install.sh", "r") as f:
             if f.read() == "":
-                print("==> \033[31m[ERROR]\033[0m: The install.sh is empty :(")
+                aopm.error("The install.sh is empty :(", True)
                 sys.exit(1)
         
         # check if the install.sh calls the '$aoproot'
@@ -195,29 +212,29 @@ esac"""
         if shutil.which("fakeroot"):
             print("==> \033[32m[SUCCESS]\033[0m: Fake root found!")
         else:
-            print("==> \033[31m[ERROR]\033[0m: Cant found the fakeroot command :(")
+            aopm.error("Cant found the 'fakeroot' command :(", True)
             sys.exit(1)
         
-        print("=> \033[36m[INFO]\033[0m: Calling compile()")
+        aopm.info("Calling 'compile()'...")
 
         os.makedirs(f"{path}/compile-build", exist_ok=True)
         env = os.environ.copy()
         env["aoproot"] = f"{path}/compile-build"
         compile_try = sub.run(["fakeroot", "sh", f"{path}/aopkg-tools/install.sh", "compile"], env=env, capture_output=True)
         if compile_try.returncode == 0:
-            print("==> \033[32m[SUCCESS]\033[0m: Package compiled!")
+            aopm.success("Package compiled!")
         else:
-            print(f"==> \033[31m[ERROR]\033[0m: Something went wrong :(. Exit code: '{compile_try.returncode}'.")
+            aopm.error(f"Failed to compile package :(. Exit code: '{compile_try.returncode}'", True)
             sys.exit(1)
         
-        print("=> \033[36m[INFO]\033[0m: Calling install()")
+        aopm.info("Calling 'install()'...")
         install_try = sub.run(["fakeroot", "sh", f"{path}/aopkg-tools/install.sh", "install"], env=env, capture_output=True)
         if install_try.returncode == 0:
-            print("==> \033[32m[SUCCESS]\033[0m: Package installed!")
+            aopm.success("Package installed!")
         else:
-            print(f"==> \033[31m[ERROR]\033[0m: Something went worng :(. Exit code: '{install_try.returncode}'.")
+            aopm.error(f"Failed to install package :(. Exit code: '{install_try.returncode}'", True)
         
-        print("=> \033[36m[INFO]\033[0m: Generating the file list...")
+        aopm.info("Generating the file: 'file-list'...")
         try:
             with open(f"{path}/file-list", "w") as f:
                 for root, dirs, archives in os.walk(f"{path}/compile-build"):
@@ -232,40 +249,35 @@ esac"""
                         file_path = os.path.relpath(os.path.join(root, archive), f"{path}/compile-build")
                         f.write("/" + file_path + "\n")
         except PermissionError:
-            print("==> \033[31m[ERROR]\033[0m: Dont have permission to create the files-list archive on the directory :(")
-            sys.exit(1)
+            aopm.error("Dont have permission to create the file: 'file-list' on the directory :(", True)
         except FileExistsError:
-            print("=> \033[33m[WARNING]\033[0m: Already exist a file-list archive. This may cause fails")
+            aopm.error("Already exist a 'file-list' file. This may cause fails", True)
 
         # check if the file-list is empty
         with open(f"{path}/file-list", "r") as f:
             if f.read() == "":
-                print("==> \033[31m[ERROR]\033[0m: The file-list is empty :(")
-                sys.exit(1)
+                aopm.error("The file 'file-list' is empty :(", True)
 
-        print("==> \033[32m[SUCCESS]\033[0m: File-list generated!")
-        print("=> \033[36m[INFO]\033[0m: Compiling into .aopkg.tar.xz")
+        aopm.success("'file-list' generated!")
+        aopm.info("Compiling into '.aopkg.tar.xz'...")
         try:
             os.makedirs(f"{path}/final-compile", exist_ok=True)
         except PermissionError:
-            print("==> \033[31m[ERROR]\033[0m: Dont have permission to create the final-compile direcotry on the directory :(")
-            sys.exit(1)
+            aopm.error("Dont have permission to create the final-compile direcotry on the directory :(", True)
         except FileExistsError:
-            print("=> \033[33m[WARNING]\033[0m: Already exist a final-compile directory. This may cause fails")
+            aopm.error("Already exist a final-compile directory. This may cause fails", True)
 
         aopkg_manifest_content = {}
         try:
             with open(f"{path}/aopkg.json", "r") as f:
                 aopkg_manifest_content = json.load(f)
         except PermissionError:
-            print("==> \033[31m[ERROR]\033[0m: Dont have permission to open the aopkg.json :(")
-            sys.exit(1)
+            aopm.error("Dont have permission to open the aopkg.json :(", True)
 
         if "name" in aopkg_manifest_content:
             pass
         else:
-            print("==> \033[0m[ERROR]\033[0m: The aopkg.json dont have the name section :(")
-            sys.exit(1)
+            aopm.error("The aopkg.json dont have the 'name' key :(", True)
 
         try:
             with tarfile.open(f"{path}/final-compile/{aopkg_manifest_content["name"]}.tar.xz", "w:xz") as tar:
@@ -274,31 +286,28 @@ esac"""
                 tar.add(f"{path}/aopkg.json", arcname="aopkg.json")
                 tar.add(f"{path}/file-list", arcname="file-list")
         except PermissionError:
-            print("==> \033[31m[ERROR]\033[0m: Dont have permission to create the .aopkg( .tar ) :(")
-            sys.exit(1)
+            aopm.error("Dont have permission to create the '.aopkg.tar.xz' file :(", True)
         except FileExistsError:
-            print("==> \033[31m[ERROR]\033[0m: Already exist an older .aopkg file :(")
-            sys.exit(1)
+            aopm.error("Already exist an older '.aopkg.tar.xz' file :(", True)
         
-        print("=> \033[36m[INFO]\033[0m: Generating SHA256...")
+        aopm.info("Generating SHA256...")
         try:
             with open(f"{path}/final-compile/sha256", "w") as f:
                 f.write(get_sha(f"{path}/final-compile/{aopkg_manifest_content["name"]}.tar.xz"))
         except PermissionError:
-            print("==> \033[31m[ERROR]\033[0m: Dont have permission to create the sha256 :(")
-            sys.exit(1)
+            aopm.error("Dont have permission to create the 'sha256' file :(", True)
         except FileExistsError:
-            print("==> \033[31m[ERROR]\033[0m: Already exist an older sha256 file :(")
-            sys.exit(1)
+            aopm.error("Already exist an older 'sha256' file :(", True)
         
-        print("==> \033[32m[SUCCESS]\033[0m: SHA256 generated! ")
+        aopm.success("SHA256 generated! ")
 
-        print("=> \033[36m[INFO]\033[0m: Making final compile...")
+        aopm.info("Making final compile...")
         os.makedirs(f"{path}/final-compile/out", exist_ok=True)
         with tarfile.open(f"{path}/final-compile/out/{aopkg_manifest_content["name"]}.aopkg.tar.xz", "w:xz") as tar:
             tar.add(f"{path}/final-compile/{aopkg_manifest_content["name"]}.tar.xz", arcname=f"{aopkg_manifest_content["name"]}.tar.xz")
             tar.add(f"{path}/final-compile/sha256", arcname="sha256")
-        print(f"==> \033[32m[INFO]\033[0m: Aopkg compiled in: '{path}/final-compile/out/{aopkg_manifest_content["name"]}.aopkg.tar.xz' :)")
+        aopm.success(f"Aopkg compiled in: '{path}/final-compile/out/{aopkg_manifest_content["name"]}.aopkg.tar.xz' :)")
+        aopm.success("Everything looks done!")
         sys.exit(0)
 
 
