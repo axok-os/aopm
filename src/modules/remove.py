@@ -78,7 +78,7 @@ def run(parameters: list, *args) -> bool:
         if file_list_content:
             pass
         else:
-            aopm.error("Cant open the file 'file-list' :(", True)
+            aopm.error("Cant open the file: 'file-list' :(", True)
         
         if aopkg_content:
             pass
@@ -108,7 +108,7 @@ def run(parameters: list, *args) -> bool:
                         case "n"|"no":
                             user_confirm = False
                         case _:
-                            aopm.error("Invalid option :(. Try again.")
+                            aopm.error("Invalid option specified :(. Try again.")
                             continue
             match user_confirm:
                 case True:
@@ -129,7 +129,7 @@ def run(parameters: list, *args) -> bool:
                                     case "n"|"no":
                                         user_confirm_warn = False
                                     case _:
-                                        aopm.error("Invalid option :(. Try again.")
+                                        aopm.error("Invalid option specified :(. Try again.")
                                         continue
                         match user_confirm_warn:
                             case True:
@@ -157,12 +157,26 @@ def run(parameters: list, *args) -> bool:
         return 0
 
 def help():
-    print("""
-remove Module:
----------------
-    Remove an package.
-Examples:
+    title_line = f"{header["name"]}-{header["version"]} Module"
+    print(f"""
+{title_line}
+{"=" * (len(title_line) + 1)}
+
+Description:
+-------------
+    Allows you to remove installed packages.
+
+Usage:
+-------
+    aopm remove <package> [options]
+
+Example(s):
 ----------
-    aopm remove aopkg - Remove the package 'aopkg'
-    aopm remove fakeroot --force - Remove the package 'fakeroot' with no questions
+    aopm remove aopkg                      Remove the specfied package.
+    aopm remove aopkg --force              Remove the specified package without the user need to accept.
+    aopm remove aopkg --force --no-warn    Remove the specified package without the user need to accept nothing.
+
+Notes:
+-------
+    Every time you try to remove a package, we will quest the user if he really wants to remove.
 """)
