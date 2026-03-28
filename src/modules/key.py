@@ -67,7 +67,7 @@ def run(parameters: list, *args) -> bool:
                                     gpg.import_keys(key_content)
                                     aopm.success("Key imported!")
                                 else:
-                                    aopm.error("Cant open key file :(", True)
+                                    aopm.error("Cant open the key file :(", True)
                             else:
                                 aopm.warn("Empty directory found in keys directory.")
                         else:
@@ -80,7 +80,7 @@ def run(parameters: list, *args) -> bool:
                 
                 if found:
                     if "--full" in argv:
-                        sub.run(["clear"])
+                        
                         print("Key Info:")
                         print("-" * 30)
                         for k in gpg.list_keys():
@@ -89,7 +89,7 @@ def run(parameters: list, *args) -> bool:
                         print("-" * 30)
                         return 0
                     else:
-                        sub.run(["clear"])
+                        
                         key_manifest_content = json.load(open(f"{keys_path}/{key_to_check}/aopkey.json", "r"))
                         print("Key Info:")
                         print("-" * 30)
@@ -98,7 +98,7 @@ def run(parameters: list, *args) -> bool:
                         print("-" * 30)
                         return 0
                 else:
-                    aopm.error(f"Cant found key: '{key_to_check}' :(", True)
+                    aopm.error(f"Cant found the key: '{key_to_check}' :(", True)
 
             case "remove":
                 aopm.info("Searching for the specified key...")
@@ -131,7 +131,7 @@ def run(parameters: list, *args) -> bool:
                 
                 if found:
                     if "--full" in argv:
-                        sub.run(["clear"])
+                        
                         print("Key Info:")
                         print("-" * 30)
                         for k in gpg.list_keys():
@@ -141,7 +141,7 @@ def run(parameters: list, *args) -> bool:
                         print("-" * 30)
                     else:
                         key_manifest_content = json.load(open(f"{keys_path}/{key_to_check}/aopkey.json", "r"))
-                        sub.run(["clear"])
+                        
                         for key in key_manifest_content:
                             print(f"{str(key).title().replace("-", " ").replace("_", " ")}: {key_manifest_content[key]}")
                         print("-" * 30)
@@ -149,6 +149,8 @@ def run(parameters: list, *args) -> bool:
                     
                     # get confirm
                     user_confirm = None
+                    if "--force" in argv:
+                        user_confirm = True
                     while user_confirm == None:
                         user_input = input(f"Want remove key: '{key_to_check}'[y/N]: ").strip()
                         if user_input.lower() == "":
@@ -161,7 +163,7 @@ def run(parameters: list, *args) -> bool:
                                 case"n"|"no":
                                     user_confirm = False
                                 case _:
-                                    aopm.error("Invalid option :(. Try again.")
+                                    aopm.error("Invalid option specified :(. Try again.")
                                     continue
                     
                     match user_confirm:
@@ -180,13 +182,25 @@ def run(parameters: list, *args) -> bool:
 
 
 def help():
-    print("""
-key Module:
-------------
-    Remove and see infos about an specified key.
-Examples:
-----------
-    aopm key info aopm - Display infos about the key 'aopm'
-    aopm key remove aopm - Remove the key 'aopm'
-        Note: After removal, this key will NOT be automatically installed.
+    title_line = f"{header["name"]}-{header["version"]} Module"
+    print(f"""
+{title_line}
+{"=" * (len(title_line) + 1)}
+
+Description:
+-------------
+    See and delete key files.
+
+Usage:
+    aopm key <method> <key> [options]
+
+Example(s):
+    aopm key info aopm             Display basic informations about the specified key.
+    aopm key info aopm --full      Display full informations about the specified key.
+    aopm key remove aopm           Display basic informations about the specified key and remove the key.
+    aopm key remove aopm --full    Display full informaitons about the specified key and remove the key.
+
+Notes:
+-------
+    With the '--force' parameter added, it will delete the key without the user need to accept.
 """)
