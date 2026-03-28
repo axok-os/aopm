@@ -14,7 +14,7 @@ import importlib.util
 from configparser import ConfigParser
 import sys
 from pathlib import Path as p
-import aopmAPI
+import aopmAPI as aopm
 
 # the API Header
 header = {
@@ -48,7 +48,7 @@ def run(parameters : list, modules_home: str, *args) -> int:
     argc = len(parameters)
     argv = parameters
     if argc < 1:
-        aopmAPI.error("Too few arguments :(", True)
+        aopm.error("Too few arguments :(", True)
     # match the first parameter
     match argv[0]:
         case "me":
@@ -64,7 +64,7 @@ Examples:
             return 0
         case "module":
             if argc < 2:
-                aopmAPI.error("You need to specify the module to get help :(", True)
+                aopm.error("You need to specify the module you want to get help for :(", True)
             else:
                 module_to_get_help = argv[1]
             path_to_search = f"{modules_home}/{module_to_get_help}.py"
@@ -73,21 +73,33 @@ Examples:
             try:
                 spec.loader.exec_module(module)
             except FileNotFoundError:
-                aopmAPI.error(f"The module: '{module_to_get_help}' dont exist :(", True)
+                aopm.error(f"The module: '{module_to_get_help}' dont exist :(", True)
 
             if hasattr(module, "help"):
                 module.help()
             else:
-                aopmAPI.error(f"The module: '{module_to_get_help}' dont have the help function :(", True)
+                aopm.error(f"The module: '{module_to_get_help}' dont have the 'help' function :(", True)
 
 def help():
-    print("""
-Help Module:
+    title_line = f"{header["name"]}-{header["version"]} Module"
+    print(f"""
+{title_line}
+{"=" * (len(title_line) + 1)}
+
+Description:
 -------------
-    The help module display help messages of how to use modules or how to use AOPM.
+    Display help messages about modules or how to use AOPM.
 
 Usage:
 -------
-    aopm help module help - Display this message
-    aopm help me - Display a message of how to use AOPM
+    aopm help <type>
+
+Example(s):
+----------
+    aopm help me                 Display this message.
+    aopm help module <module>    Display a help message about the specified module.
+
+Note:
+------
+    To see the help message from a module, the module must have the help module support.
 """)
