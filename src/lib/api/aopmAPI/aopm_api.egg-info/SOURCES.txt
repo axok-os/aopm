@@ -1,8 +1,0 @@
-README.md
-pyproject.toml
-aopmAPI/__init__.py
-aopmAPI/main.py
-aopm_api.egg-info/PKG-INFO
-aopm_api.egg-info/SOURCES.txt
-aopm_api.egg-info/dependency_links.txt
-aopm_api.egg-info/top_level.txt
