@@ -181,13 +181,13 @@ def run(parameters: list, *args) -> int:
             with open(f"{tmp}/extract1/sha256", "r") as f:
                 sha_to_match = f.read()
         except FileNotFoundError:
-            aopm.error("Cant found the sha256 file :(", True)
+            aopm.error("Cant found the sha256 file from package :(", True)
 
         if sha_to_match:
             if get_sha(f"{tmp}/extract1/{package_to_search}.tar.xz") == sha_to_match:
                 aopm.success("The SHA256 match!")
             else:
-                aopm.error("The SHA256 dont match :(", True)
+                aopm.error("The SHA256 from package dont match :(. For security reasons, we will not install.\nIf you want install anyway edit the '/etc/aopm.d/aopm.conf'", True)
         
         aopm.info("Checking if package have GPG signature...")
         verified = False
@@ -237,13 +237,13 @@ def run(parameters: list, *args) -> int:
             if p(dirs).is_dir():
                 pass
             else:
-                aopm.error(f"Cant found the directory: '{dirs}' :(", True)
+                aopm.error(f"Cant found the directory: '{dirs}' in package :(", True)
         
         for files in must_files:
             if p(files).is_file():
                 pass
             else:
-                aopm.error(f"Cant found the file: '{files}' :(", True)
+                aopm.error(f"Cant found the file: '{files}' in package :(", True)
         
         aopm.info("Opening manifest...")
         aopkg_manifest_content = json.load(open(f"{tmp}/extract2/aopkg.json", "r"))
@@ -276,7 +276,7 @@ def run(parameters: list, *args) -> int:
                         case "n"|"no":
                             user_confirm = False
                         case _:
-                            aopm.error("Invalid option :(. Try again")
+                            aopm.error("Invalid option specified :(. Try again")
                             continue
         
         if user_confirm:
@@ -300,7 +300,7 @@ def run(parameters: list, *args) -> int:
                                 case "n"|"no":
                                     user_confirm_warn = False
                                 case _:
-                                    aopm.error("Invalid option :(. Try again.")
+                                    aopm.error("Invalid option specified :(. Try again.")
                                     continue
                     match user_confirm_warn:
                         case True:
@@ -315,33 +315,35 @@ def run(parameters: list, *args) -> int:
             if pre_install_try.returncode == 0:
                 aopm.success("Pre-install triggers executed!")
             else:
-                aopm.error(f"Something went wrong :(. Exit code: {pre_install_try.returncode}", True)
+                aopm.error(f"Failed to execute pre-install triggers :(. Exit code: {pre_install_try.returncode}", True)
             aopm.info("Installing package...")
             
             install_try = sub.run(["bash", f"{tmp}/extract2/aopkg-tools/install.sh", "install"], env=env, capture_output=True)
             if install_try.returncode == 0:
                 aopm.success("Package installed!")
             else:
-                aopm.error(f"Something went wrong :(. Exit code: {install_try.returncode}")
-            
+                aopm.error(f"Failed to install package :(. Exit code: {install_try.returncode}", True)
+
             aopm.info("Executing post-install triggers...")
             post_install_try = sub.run(["bash", f"{tmp}/extract2/aopkg-tools/install.sh", "post_install"], env=env, capture_output=True)
             if post_install_try.returncode == 0:
                 aopm.success("Post-install triggers executed!")
             else:
-                aopm.error(f"Something went wrong :(. Exit code: {post_install_try.returncode}", True)
+                aopm.error(f"Failed to execute post-install triggers :(. Exit code: {post_install_try.returncode}", True)
 
             
             aopm.info("Adding package to 'installed packages'...")
             packages_path = args[4]
-            try:
-                os.makedirs(f"{packages_path}/{package_to_search}", exist_ok=True)
-            except FileExistsError:
-                aopm.warn("Already exist a directory :(. Deleting...")
-                os.remove(f"{packages_path}/{package_to_search}")
-                os.makedirs(f"{packages_path}/{package_to_search}", exist_ok=True)
-            shutil.copy(f"{tmp}/extract2/aopkg.json", f"{packages_path}/{package_to_search}/aopkg.json")
-            shutil.copy(f"{tmp}/extract2/file-list", f"{packages_path}/{package_to_search}/file-list")
+            pkg_dir = f"{packages_path}/{package_to_search}"
+
+            if os.path.exists(pkg_dir):
+                aopm.warn("Direcotry already exists. Removing...")
+                shutil.rmtree(pkg_dir)
+            
+            os.makedirs(pkg_dir)
+            
+            shutil.copy(f"{tmp}/extract2/aopkg.json", f"{pkg_dir}/aopkg.json")
+            shutil.copy(f"{tmp}/extract2/file-list", f"{pkg_dir}/file-list")
             
             aopm.success("Package added to 'installed packages!'")
             aopm.success("Everything looks done!")
@@ -351,12 +353,25 @@ def run(parameters: list, *args) -> int:
             return 1
 
 def help():
-    print("""
-install Module:
-----------------
-    Install packages.
-Examples:
+    title_line = f"{header["name"]}-{header["version"]} Module"
+    print(f"""
+{title_line}
+{"=" * (len(title_line) + 1)}
+
+Description:
+-------------
+    Allows you to install pacakges from initialized repositories.
+
+Usage:
+-------
+    aopm install <package> [options]
+
+Example(s):
 ----------
-    aopm install grub-efi - Search and install the package 'grub-efi'
-    aopm install aopkg - Search and install the package 'aopkg'
+    aopm install grub-efi    Install the 'grub-efi' package.
+    aopm install aopkg       Install the 'aopkg' package.
+
+Notes:
+-------
+    You can only install one package at time.
 """)
