@@ -6,8 +6,6 @@
     Axok!_OS Package Manager
 </pre>
 
-> A package manager! (no dependencies — by design)
-
 **AOPM (Axok!\_OS Package Manager)** is a simple and straightforward package manager made for Axok!\_OS.
 
 ## Features
@@ -15,10 +13,6 @@
 - Built with Python 3 🐍
 - Simple and transparent 🪟
 - Modular and expandable 🧩
-- **No dependencies. No chaos. 🚫📦**
-  - No dependency resolution system
-  - No dependency hell
-  - Just install and run
 
 ## ⚠️ Project Status
 
